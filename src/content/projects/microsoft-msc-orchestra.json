@@ -1,0 +1,13 @@
+{
+  "title": "MSC The Orchestra",
+  "client": "Microsoft",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/microsoft-msc-orchestra.jpg",
+  "videoSrc": "/video/placeholder/microsoft-msc-orchestra.mp4",
+  "order": 10,
+  "fullVideoSrc": "/video/full/microsoft-msc-orchestra.mp4"
+}

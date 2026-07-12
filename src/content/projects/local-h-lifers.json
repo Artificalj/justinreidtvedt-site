@@ -1,0 +1,12 @@
+{
+  "title": "Lifers",
+  "client": "Local H",
+  "roles": [
+    "Producer"
+  ],
+  "category": "narrative",
+  "thumbnail": "/images/projects/local-h-lifers.jpg",
+  "videoSrc": "/video/placeholder/local-h-lifers.mp4",
+  "order": 21,
+  "fullVideoSrc": "/video/full/local-h-lifers.mp4"
+}

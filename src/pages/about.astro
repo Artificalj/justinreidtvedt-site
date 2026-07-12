@@ -1,0 +1,23 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SignalPortrait from "../components/SignalPortrait.astro";
+
+const paragraphs = [
+  "Justin Reid Tvedt boasts over 15 years of directorial and production expertise, earning accolades for his outstanding work. Renowned for his fearlessness, Justin attributes his success to the collaborative efforts of the teams he fosters within his community.",
+  "Justin's journey began in the basements of DIY house shows, where he formed bands, orchestrated shows, and captured the essence of music through his cheap point-and-shoot camera.",
+  "Driven by an insatiable hunger and a fervent passion for collaboration, Justin's philosophy centers on creating an environment that encourages collective risk-taking. He believes in empowering every team member to unleash their full potential and share in the collective triumphs.",
+  "In his recent tenure with Vital Proteins, Justin played a pivotal role in shaping their in-house production arm, demonstrating his ability to deliver exceptional results. His impressive client roster includes esteemed names such as Nature Made Vitamins, Microsoft, Personify, and Red Bull.",
+];
+---
+
+<Layout title="About">
+  <div class="grid grid-cols-1 md:grid-cols-2 md:items-stretch md:gap-8 md:min-h-[calc(100vh-65px)]">
+    <div class="flex flex-col justify-center gap-4 px-4 py-6 sm:px-8 max-w-prose">
+      <h1 class="font-(family-name:--font-display) text-3xl italic">Justın Reıd Tvedt</h1>
+      {paragraphs.map((p) => <p class="leading-relaxed">{p}</p>)}
+    </div>
+    <div class="px-4 pb-6 sm:px-0 md:h-full">
+      <SignalPortrait src="/images/headshot-placeholder.jpg" alt="Justin Reid Tvedt" />
+    </div>
+  </div>
+</Layout>

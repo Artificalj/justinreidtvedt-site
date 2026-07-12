@@ -1,0 +1,82 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+
+const { projects } = Astro.props;
+const present = new Set(projects.map((p) => p.data.category));
+
+const allCategories = [
+  { key: "all", label: "ALL" },
+  { key: "commercial", label: "COMMERCIAL" },
+  { key: "music-video", label: "MUSIC VIDEO" },
+  { key: "narrative", label: "NARRATIVE" },
+];
+const categories = allCategories.filter((cat) => cat.key === "all" || present.has(cat.key as any));
+---
+
+<nav class="flex flex-wrap gap-x-2 px-4 pb-4 sm:px-8 text-sm tracking-wide" data-category-filter>
+  {categories.map((cat, i) => (
+    <>
+      {i > 0 && <span class="text-(--color-muted)">|</span>}
+      <button
+        type="button"
+        data-filter={cat.key}
+        class:list={[
+          "cursor-pointer hover:opacity-60 transition-opacity",
+          cat.key === "all" && "underline underline-offset-4",
+        ]}
+      >
+        {cat.label}
+      </button>
+    </>
+  ))}
+</nav>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const filterBar = document.querySelector("[data-category-filter]");
+    const grid = document.querySelector("[data-project-grid]");
+    if (!filterBar || !grid) return;
+
+    const buttons = filterBar.querySelectorAll<HTMLButtonElement>("[data-filter]");
+    const items = grid.querySelectorAll<HTMLElement>("[data-category]");
+
+    buttons.forEach((btn) => {
+      if (btn.dataset.cfInit) return;
+      btn.dataset.cfInit = "true";
+      btn.addEventListener("click", () => {
+        const filter = btn.dataset.filter;
+        buttons.forEach((b) => b.classList.remove("underline", "underline-offset-4"));
+        btn.classList.add("underline", "underline-offset-4");
+        items.forEach((item) => {
+          const match = filter === "all" || item.dataset.category === filter;
+          item.classList.toggle("hidden", !match);
+        });
+
+        if (filter === "all") {
+          document.dispatchEvent(new CustomEvent("hero:unlock"));
+          return;
+        }
+
+        const representative = Array.from(items).find((item) => item.dataset.category === filter);
+        if (representative) {
+          document.dispatchEvent(
+            new CustomEvent("hero:lock", {
+              detail: {
+                category: filter,
+                item: {
+                  src: representative.dataset.heroSrc,
+                  poster: representative.dataset.heroPoster,
+                  title: representative.dataset.heroTitle,
+                },
+              },
+            })
+          );
+        }
+      });
+    });
+  });
+</script>

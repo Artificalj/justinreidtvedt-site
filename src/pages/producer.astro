@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import ProjectGrid from "../components/ProjectGrid.astro";
+import CategoryFilter from "../components/CategoryFilter.astro";
+import HeroReel from "../components/HeroReel.astro";
+import { withBase } from "../lib/paths";
+
+const allProjects = await getCollection("projects");
+const byOrder = (a: (typeof allProjects)[number], b: (typeof allProjects)[number]) => a.data.order - b.data.order;
+
+const producerOnly = allProjects
+  .filter((p) => p.data.roles.includes("Producer") && !p.data.roles.includes("Director"))
+  .sort(byOrder);
+
+const dualCredit = allProjects
+  .filter((p) => p.data.roles.includes("Producer") && p.data.roles.includes("Director"))
+  .sort(byOrder);
+---
+
+<Layout title="Producer">
+  <HeroReel reel={producerOnly} />
+  <div class="mt-16 sm:mt-24">
+    <CategoryFilter projects={producerOnly} />
+    <ProjectGrid projects={producerOnly} />
+  </div>
+
+  {dualCredit.length > 0 && (
+    <div class="mt-16 mb-16 px-4 sm:px-8 sm:mt-24 sm:mb-24">
+      <h2 class="mb-4 font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">
+        ADDITIONAL PRODUCING CREDITS
+      </h2>
+      <ul class="flex flex-col gap-2 max-w-2xl">
+        {dualCredit.map((p) => (
+          <li>
+            <a href={withBase(`/work/${p.id}`)} class="flex items-baseline justify-between gap-4 py-1 hover:opacity-60 transition-opacity">
+              <span>
+                {p.data.client ? `${p.data.client}: ${p.data.title}` : p.data.title}
+              </span>
+              <span class="shrink-0 font-(family-name:--font-mono) text-xs text-(--color-muted)">
+                DIR / PROD
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</Layout>

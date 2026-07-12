@@ -1,0 +1,145 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SignalPortrait from "../components/SignalPortrait.astro";
+import VideoPlayer from "../components/VideoPlayer.astro";
+
+const colors = [
+  { name: "Paper", token: "--color-paper", hex: "#F6F5F2", note: "Resting background. Warm, not stark white." },
+  { name: "Ink", token: "--color-ink", hex: "#0B0B0C", note: "Primary text. Near-black, not pure black." },
+  { name: "Muted", token: "--color-muted", hex: "#6B6B6B", note: "Secondary labels, captions, filters." },
+  { name: "Line", token: "--color-line", hex: "#E2E0DA", note: "Hairlines, placeholder fills." },
+  { name: "Void", token: "--color-void", hex: "#050505", note: "Cinema mode background. Night state." },
+  { name: "Signal", token: "--color-signal", hex: "#FFB020", note: "The one accent. Darkroom-safelight amber — reserved for active/playing states, never decorative." },
+];
+
+const typeSpecimens = [
+  {
+    role: "Wordmark",
+    token: "--font-wordmark",
+    family: "Bodoni Moda (italic)",
+    usage: "The name mark only — hero moments. Never for body copy or UI.",
+    sample: "Justin Reid Tvedt",
+    class: "font-(family-name:--font-wordmark) italic text-5xl tracking-wide",
+  },
+  {
+    role: "Display",
+    token: "--font-display",
+    family: "Instrument Serif",
+    usage: "Headlines, project titles, section intros. Used with restraint.",
+    sample: "Vital Proteins: Feed What Moves You",
+    class: "font-(family-name:--font-display) italic text-4xl",
+  },
+  {
+    role: "Body",
+    token: "--font-sans",
+    family: "Archivo",
+    usage: "Navigation, UI labels, paragraph copy.",
+    sample: "Director of photography, editor, and collaborator across commercial and music work.",
+    class: "font-(family-name:--font-sans) text-lg",
+  },
+  {
+    role: "Data",
+    token: "--font-mono",
+    family: "IBM Plex Mono",
+    usage: "Timecodes, coordinates, signal readouts. Never for prose.",
+    sample: "00:00:04:12 — 41.8781°N 87.6298°W",
+    class: "font-(family-name:--font-mono) text-lg tracking-wide",
+  },
+];
+---
+
+<Layout title="Style Guide">
+  <div class="mx-auto max-w-4xl px-4 py-16 sm:px-8">
+    <h1 class="font-(family-name:--font-display) text-4xl italic">Brand &amp; Style Guide</h1>
+    <p class="mt-3 max-w-prose text-(--color-muted)">
+      Internal reference for the visual language of this site — themes of motion, signals, and
+      time/space, executed with restraint. This page pulls from the live design tokens, so it
+      stays accurate as the system evolves.
+    </p>
+
+    <section class="mt-16">
+      <h2 class="font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">TYPE HIERARCHY</h2>
+      <div class="mt-6 flex flex-col divide-y divide-(--color-line)">
+        {typeSpecimens.map((t) => (
+          <div class="grid grid-cols-1 gap-2 py-8 sm:grid-cols-[160px_1fr]">
+            <div>
+              <p class="font-(family-name:--font-mono) text-xs tracking-[0.15em] text-(--color-muted)">{t.role.toUpperCase()}</p>
+              <p class="mt-1 text-sm text-(--color-muted)">{t.family}</p>
+              <p class="mt-2 text-xs text-(--color-muted)">{t.usage}</p>
+            </div>
+            <p class:list={[t.class]}>{t.sample}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-16">
+      <h2 class="font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">COLOR SYSTEM</h2>
+      <div class="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
+        {colors.map((c) => (
+          <div>
+            <div
+              class="aspect-square w-full rounded-sm border border-(--color-line)"
+              style={`background-color: var(${c.token});`}
+            ></div>
+            <p class="mt-2 font-(family-name:--font-mono) text-xs tracking-wide">{c.name.toUpperCase()}</p>
+            <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">{c.hex}</p>
+            <p class="mt-1 text-xs text-(--color-muted)">{c.note}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-16">
+      <h2 class="font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">MOTION &amp; SIGNATURE</h2>
+      <div class="mt-6 flex flex-col gap-8 text-sm leading-relaxed">
+        <div>
+          <p class="font-(family-name:--font-display) text-xl italic">Signal Portrait</p>
+          <p class="mt-1 max-w-prose text-(--color-muted)">
+            The About page headshot scroll-parallaxes and glitches in proportion to mouse
+            velocity — chromatic aberration, scan-line noise, and an SVG displacement filter
+            that intensifies with movement and settles back to a calm "SIG 000" reading when
+            still. Interference as metaphor: the more you disturb the signal, the more it
+            distorts.
+          </p>
+        </div>
+        <div>
+          <p class="font-(family-name:--font-display) text-xl italic">Cinema Mode</p>
+          <p class="mt-1 max-w-prose text-(--color-muted)">
+            Playing any video pops it into a viewport-relative centered overlay with an amber
+            glow, and the whole page shifts from Paper to Void — day becomes night for the
+            duration of the piece. Reverts on pause. Timecodes display as real SMPTE frame
+            code, not a plain counter.
+          </p>
+        </div>
+        <div>
+          <p class="font-(family-name:--font-display) text-xl italic">Hero Reel</p>
+          <p class="mt-1 max-w-prose text-(--color-muted)">
+            Idle, the homepage hero auto-cycles through the reel. Hovering any project tile
+            previews it instantly; clicking a category label locks the hero to that section
+            until released. A stand-in for a real edited sizzle reel, swappable later with no
+            code changes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-16">
+      <h2 class="font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">LIVE DEMO — SIGNAL PORTRAIT</h2>
+      <div class="mt-6 max-w-sm">
+        <SignalPortrait src="/images/headshot-placeholder.jpg" alt="Signal portrait demo" />
+      </div>
+    </section>
+
+    <section class="mt-16 mb-16">
+      <h2 class="font-(family-name:--font-mono) text-xs tracking-[0.2em] text-(--color-muted)">LIVE DEMO — CINEMA MODE</h2>
+      <div class="mt-6 max-w-2xl">
+        <VideoPlayer
+          src="/video/placeholder/feed-what-moves-you.mp4"
+          poster="/images/projects/feed-what-moves-you.jpg"
+          title="Cinema mode demo"
+        />
+      </div>
+    </section>
+  </div>
+</Layout>

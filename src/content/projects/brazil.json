@@ -1,0 +1,17 @@
+{
+  "title": "What Is Collagen: Brazil",
+  "client": "Vital Proteins",
+  "roles": [
+    "Producer",
+    "Editor"
+  ],
+  "director": "Felix Pinero",
+  "category": "commercial",
+  "thumbnail": "/images/projects/brazil.jpg",
+  "videoSrc": "/video/placeholder/brazil.mp4",
+  "order": 20,
+  "fullVideoSrc": "/video/full/brazil.mp4",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}

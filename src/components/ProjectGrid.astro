@@ -1,0 +1,86 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+
+const { projects } = Astro.props;
+const sorted = [...projects].sort((a, b) => a.data.order - b.data.order);
+---
+
+<div class="grid grid-cols-1 gap-x-6 gap-y-10 px-4 sm:px-8 md:grid-cols-2 md:gap-x-8 lg:grid-cols-3" data-project-grid>
+  {sorted.map((project) => (
+    <a
+      href={withBase(`/work/${project.id}`)}
+      class="reveal group relative block aspect-video overflow-hidden bg-black"
+      data-category={project.data.category}
+      data-hero-src={withBase(project.data.videoSrc)}
+      data-hero-poster={withBase(project.data.thumbnail)}
+      data-hero-title={project.data.title}
+    >
+      <img
+        src={withBase(project.data.thumbnail)}
+        alt={project.data.title}
+        class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+        loading="lazy"
+      />
+      {project.data.client && (
+        <span class="absolute left-4 top-4 font-(family-name:--font-mono) text-[11px] tracking-[0.15em] text-white/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+          {project.data.client.toUpperCase()}
+        </span>
+      )}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+      <div class="absolute inset-x-4 bottom-4 translate-y-1 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <span class="font-(family-name:--font-display) text-lg italic text-white">{project.data.title}</span>
+      </div>
+    </a>
+  ))}
+</div>
+
+<script>
+  function initReveal() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 }
+    );
+
+    document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => observer.observe(el));
+  }
+
+  function initHeroPreview() {
+    document.querySelectorAll<HTMLAnchorElement>("[data-hero-src]").forEach((tile) => {
+      if (tile.dataset.hpInit) return;
+      tile.dataset.hpInit = "true";
+
+      tile.addEventListener("mouseenter", () => {
+        document.dispatchEvent(
+          new CustomEvent("hero:preview", {
+            detail: {
+              src: tile.dataset.heroSrc,
+              poster: tile.dataset.heroPoster,
+              title: tile.dataset.heroTitle,
+            },
+          })
+        );
+      });
+
+      tile.addEventListener("mouseleave", () => {
+        document.dispatchEvent(new CustomEvent("hero:preview-end"));
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    initReveal();
+    initHeroPreview();
+  });
+</script>

@@ -1,0 +1,13 @@
+{
+  "title": "Choose Chicago",
+  "client": "City of Chicago",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/choose-chicago.jpg",
+  "videoSrc": "/video/placeholder/choose-chicago.mp4",
+  "order": 5,
+  "fullVideoSrc": "/video/full/choose-chicago.mp4"
+}

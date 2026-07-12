@@ -1,0 +1,213 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  reel: CollectionEntry<"projects">[];
+}
+
+const { reel } = Astro.props;
+const reelData = reel.map((p) => ({
+  src: withBase(p.data.heroSrc ?? p.data.videoSrc),
+  poster: withBase(p.data.heroPoster ?? p.data.thumbnail),
+  title: p.data.title,
+}));
+const first = reelData[0];
+---
+
+<section class="relative h-[78vh] min-h-[420px] w-full overflow-hidden bg-(--color-void)" data-hero>
+  <div class="absolute inset-0" style="transform: translate(var(--hero-px, 0px), var(--hero-py, 0px));" data-hero-parallax>
+    <video
+      class="hero-layer absolute inset-0 h-full w-full object-cover opacity-90"
+      data-layer="a"
+      src={first.src}
+      poster={first.poster}
+      autoplay
+      muted
+      loop
+      playsinline
+    ></video>
+    <video
+      class="hero-layer absolute inset-0 h-full w-full object-cover opacity-0"
+      data-layer="b"
+      muted
+      loop
+      playsinline
+    ></video>
+  </div>
+
+  <div class="scanlines pointer-events-none absolute inset-0 opacity-60"></div>
+
+  <div class="absolute inset-0 bg-gradient-to-t from-(--color-void)/80 via-transparent to-(--color-void)/20"></div>
+
+  <div class="absolute inset-0 flex flex-col items-start justify-end px-4 pb-10 sm:px-8">
+    <h1 class="font-(family-name:--font-wordmark) text-[clamp(2.5rem,8vw,6.5rem)] italic leading-[0.95] tracking-wide text-white">
+      Justın Reıd Tvedt
+    </h1>
+    <div class="mt-3 flex items-center gap-3 font-(family-name:--font-mono) text-xs tracking-[0.2em] text-white/70">
+      <span>DIRECTOR&nbsp;&nbsp;/&nbsp;&nbsp;CHICAGO</span>
+      <span class="text-white/30">—</span>
+      <span data-hero-label>{first.title.toUpperCase()}</span>
+    </div>
+  </div>
+
+  <script type="application/json" data-reel-json set:html={JSON.stringify(reelData)}></script>
+</section>
+
+<script>
+  interface ReelItem {
+    src: string;
+    poster: string;
+    title: string;
+  }
+
+  function initHeroParallax(root: HTMLElement) {
+    const parallax = root.querySelector<HTMLElement>("[data-hero-parallax]");
+    if (!parallax) return () => {};
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let raf = 0;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = root.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      // Deliberately tiny range — a whisper of drift, not a display effect.
+      targetX = relX * -6;
+      targetY = relY * -4;
+    };
+
+    function tick() {
+      currentX += (targetX - currentX) * 0.04;
+      currentY += (targetY - currentY) * 0.04;
+      parallax.style.setProperty("--hero-px", `${currentX.toFixed(2)}px`);
+      parallax.style.setProperty("--hero-py", `${currentY.toFixed(2)}px`);
+      raf = requestAnimationFrame(tick);
+    }
+
+    root.addEventListener("mousemove", onMouseMove);
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      root.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(raf);
+    };
+  }
+
+  function initHero(root: HTMLElement) {
+    const json = root.querySelector<HTMLScriptElement>("[data-reel-json]")!;
+    const reel: ReelItem[] = JSON.parse(json.textContent || "[]");
+    const layerA = root.querySelector<HTMLVideoElement>('[data-layer="a"]')!;
+    const layerB = root.querySelector<HTMLVideoElement>('[data-layer="b"]')!;
+    const label = root.querySelector<HTMLElement>("[data-hero-label]")!;
+    const cleanupParallax = initHeroParallax(root);
+
+    let activeLayer = layerA;
+    let idleLayer = layerB;
+    let idleIndex = 0;
+    let idleTimer: ReturnType<typeof setInterval> | null = null;
+    let lockedCategory: string | null = null;
+    let lockedItem: ReelItem | null = null;
+    let isPreviewing = false;
+
+    function showItem(item: ReelItem) {
+      const incoming = idleLayer;
+      const outgoing = activeLayer;
+
+      const reveal = () => {
+        incoming.removeEventListener("canplay", reveal);
+        incoming.classList.remove("opacity-0");
+        outgoing.classList.add("opacity-0");
+      };
+
+      incoming.poster = item.poster;
+      incoming.src = item.src;
+      incoming.addEventListener("canplay", reveal, { once: true });
+      incoming.load();
+      incoming.play().catch(() => {});
+
+      [activeLayer, idleLayer] = [incoming, outgoing];
+      label.textContent = item.title.toUpperCase();
+    }
+
+    function startIdleCycle() {
+      stopIdleCycle();
+      idleTimer = setInterval(() => {
+        idleIndex = (idleIndex + 1) % reel.length;
+        showItem(reel[idleIndex]);
+      }, 6000);
+    }
+
+    function stopIdleCycle() {
+      if (idleTimer) clearInterval(idleTimer);
+      idleTimer = null;
+    }
+
+    function resolveIdleState() {
+      if (lockedItem) {
+        showItem(lockedItem);
+        stopIdleCycle();
+      } else {
+        startIdleCycle();
+      }
+    }
+
+    const onPreview = ((e: CustomEvent<ReelItem>) => {
+      isPreviewing = true;
+      stopIdleCycle();
+      showItem(e.detail);
+    }) as EventListener;
+
+    const onPreviewEnd = (() => {
+      isPreviewing = false;
+      resolveIdleState();
+    }) as EventListener;
+
+    const onLock = ((e: CustomEvent<{ category: string; item: ReelItem }>) => {
+      const { category, item } = e.detail;
+      lockedCategory = category;
+      lockedItem = item;
+      document.dispatchEvent(new CustomEvent("hero:lock-changed", { detail: { category: lockedCategory } }));
+      if (!isPreviewing) resolveIdleState();
+    }) as EventListener;
+
+    const onUnlock = (() => {
+      lockedCategory = null;
+      lockedItem = null;
+      document.dispatchEvent(new CustomEvent("hero:lock-changed", { detail: { category: null } }));
+      if (!isPreviewing) resolveIdleState();
+    }) as EventListener;
+
+    document.addEventListener("hero:preview", onPreview);
+    document.addEventListener("hero:preview-end", onPreviewEnd);
+    document.addEventListener("hero:lock", onLock);
+    document.addEventListener("hero:unlock", onUnlock);
+
+    startIdleCycle();
+
+    return () => {
+      stopIdleCycle();
+      document.removeEventListener("hero:preview", onPreview);
+      document.removeEventListener("hero:preview-end", onPreviewEnd);
+      document.removeEventListener("hero:lock", onLock);
+      document.removeEventListener("hero:unlock", onUnlock);
+      cleanupParallax();
+    };
+  }
+
+  let cleanup: (() => void) | null = null;
+
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = null;
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector<HTMLElement>("[data-hero]");
+    if (!root) return;
+    cleanup = initHero(root);
+  });
+</script>

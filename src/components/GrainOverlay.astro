@@ -1,0 +1,56 @@
+<div class="grain-overlay" data-grain></div>
+
+<script>
+  function initGrain(root: HTMLElement) {
+    let lastX = 0;
+    let lastY = 0;
+    let lastT = performance.now();
+    let velocity = 0;
+    let intensity = 0;
+    let hasPointer = false;
+
+    const controller = new AbortController();
+
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        const now = performance.now();
+        const dt = Math.max(now - lastT, 1);
+        const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+        if (hasPointer) velocity = dist / dt;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastT = now;
+        hasPointer = true;
+      },
+      { signal: controller.signal }
+    );
+
+    function tick() {
+      if (!root.isConnected) {
+        controller.abort();
+        return;
+      }
+
+      intensity += (Math.min(velocity, 3) / 3 - intensity) * 0.08;
+      velocity *= 0.85;
+
+      const opacity = 0.05 + intensity * 0.16;
+      const duration = 8 - intensity * 6.5;
+
+      root.style.setProperty("--grain-opacity", opacity.toFixed(3));
+      root.style.setProperty("--grain-duration", `${duration.toFixed(2)}s`);
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector<HTMLElement>("[data-grain]");
+    if (!root || root.dataset.grainInit) return;
+    root.dataset.grainInit = "true";
+    initGrain(root);
+  });
+</script>

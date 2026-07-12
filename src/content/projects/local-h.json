@@ -1,0 +1,13 @@
+{
+  "title": "Local H",
+  "client": "Local H",
+  "roles": [
+    "Producer"
+  ],
+  "director": "Felix Pinero",
+  "category": "music-video",
+  "thumbnail": "/images/projects/local-h.jpg",
+  "videoSrc": "/video/placeholder/local-h.mp4",
+  "order": 7,
+  "fullVideoSrc": "/video/full/local-h.mp4"
+}

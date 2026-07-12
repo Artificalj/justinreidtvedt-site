@@ -1,0 +1,161 @@
+---
+import { withBase } from "../lib/paths";
+
+interface Props {
+  src: string;
+  alt: string;
+}
+
+const { src: rawSrc, alt } = Astro.props;
+const src = withBase(rawSrc);
+---
+
+<div class="signal-portrait relative flex flex-col md:h-full" data-signal-portrait>
+  <svg width="0" height="0" style="position: absolute;">
+    <filter id="signal-distort" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="2" seed="7" result="noise" data-turbulence />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" data-displacement />
+    </filter>
+  </svg>
+
+  <div class="relative aspect-4/5 overflow-hidden bg-(--color-void) md:aspect-auto md:h-auto md:flex-1" data-frame>
+    <div class="absolute inset-0" style="filter: url(#signal-distort);" data-distort-target>
+      <div class="signal-scroll-track absolute inset-x-0 top-0 h-[200%]" data-scroll-track>
+        {[0, 1].map((copy) => (
+          <div class="absolute inset-x-0 h-1/2 w-full" style={`top: ${copy * 50}%;`}>
+            <img
+              src={src}
+              alt={copy === 0 ? alt : ""}
+              aria-hidden={copy === 0 ? undefined : "true"}
+              class="absolute inset-0 h-full w-full object-cover [object-position:50%_0%]"
+              style="transform: translate(var(--px, 0px), 0px);"
+              data-parallax-img
+            />
+            <img
+              src={src}
+              alt=""
+              aria-hidden="true"
+              class="absolute inset-0 h-full w-full object-cover [object-position:50%_0%] opacity-0 mix-blend-screen"
+              style="filter: saturate(3) sepia(1) hue-rotate(-40deg) brightness(1.2); transform: translate(calc(var(--px, 0px) + var(--ab, 0px)), 0px);"
+              data-parallax-img
+              data-channel="warm"
+            />
+            <img
+              src={src}
+              alt=""
+              aria-hidden="true"
+              class="absolute inset-0 h-full w-full object-cover [object-position:50%_0%] opacity-0 mix-blend-screen"
+              style="filter: saturate(3) hue-rotate(150deg) brightness(1.2); transform: translate(calc(var(--px, 0px) - var(--ab, 0px)), 0px);"
+              data-parallax-img
+              data-channel="cool"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="tv-lines pointer-events-none absolute inset-0"></div>
+    <div class="signal-roll-band pointer-events-none absolute inset-x-0"></div>
+  </div>
+
+  <div class="mt-2 flex items-center justify-between font-(family-name:--font-mono) text-xs text-(--color-muted)">
+    <span>41.8781°N&nbsp;&nbsp;87.6298°W</span>
+    <span data-signal-timecode>00:00:00:00</span>
+    <span data-signal-readout>SIG&nbsp;000</span>
+  </div>
+</div>
+
+<script>
+  function initSignalPortrait(root: HTMLElement) {
+    const distortTarget = root.querySelector<HTMLElement>("[data-distort-target]")!;
+    const warmLayers = root.querySelectorAll<HTMLElement>('[data-channel="warm"]');
+    const coolLayers = root.querySelectorAll<HTMLElement>('[data-channel="cool"]');
+    const turbulence = root.querySelector<SVGFETurbulenceElement>("[data-turbulence]")!;
+    const displacement = root.querySelector<SVGFEDisplacementMapElement>("[data-displacement]")!;
+    const readout = root.querySelector<HTMLElement>("[data-signal-readout]")!;
+    const timecodeEl = root.querySelector<HTMLElement>("[data-signal-timecode]")!;
+
+    const TC_FPS = 24;
+    function formatTimecode(seconds: number): string {
+      const totalFrames = Math.floor(seconds * TC_FPS);
+      const h = Math.floor(totalFrames / (TC_FPS * 3600));
+      const m = Math.floor((totalFrames / (TC_FPS * 60)) % 60);
+      const s = Math.floor((totalFrames / TC_FPS) % 60);
+      const f = Math.floor(totalFrames % TC_FPS);
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+    }
+
+    let lastX = 0;
+    let lastY = 0;
+    let lastT = performance.now();
+    let velocity = 0;
+    let intensity = 0;
+    let hasPointer = false;
+
+    const controller = new AbortController();
+
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        const now = performance.now();
+        const dt = Math.max(now - lastT, 1);
+        const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+        if (hasPointer) {
+          velocity = dist / dt;
+        }
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastT = now;
+        hasPointer = true;
+      },
+      { signal: controller.signal }
+    );
+
+    const startTime = performance.now();
+
+    function tick(now: number) {
+      if (!root.isConnected) {
+        controller.abort();
+        return;
+      }
+
+      // Mouse-reactive glitch intensity, dialed down to a third of the original sensitivity.
+      intensity += (Math.min(velocity, 3) / 3 - intensity) * 0.15;
+      velocity *= 0.85;
+      const dampenedIntensity = intensity / 3;
+
+      // Constant low-level "bad reception" waver, always running underneath the mouse reactivity —
+      // two overlapping sine waves so it doesn't look like a metronome.
+      const t = (now - startTime) / 1000;
+      const baseline = 0.12 + Math.sin(t * 0.9) * 0.05 + Math.sin(t * 2.3 + 1) * 0.03;
+      const combined = baseline + dampenedIntensity;
+
+      const displaceScale = combined * 55;
+      const baseFreq = 0.006 + combined * 0.03;
+      const abOffset = combined * 8;
+
+      turbulence.setAttribute("baseFrequency", baseFreq.toFixed(4));
+      displacement.setAttribute("scale", displaceScale.toFixed(2));
+      const warmCoolOpacity = String(Math.min(combined * 0.9, 0.85));
+      warmLayers.forEach((el) => (el.style.opacity = warmCoolOpacity));
+      coolLayers.forEach((el) => (el.style.opacity = warmCoolOpacity));
+      readout.textContent = `SIG ${Math.round(combined * 999).toString().padStart(3, "0")}`;
+      timecodeEl.textContent = formatTimecode(t);
+
+      distortTarget.style.setProperty("--px", "0px");
+      distortTarget.style.setProperty("--ab", `${abOffset}px`);
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>("[data-signal-portrait]").forEach((root) => {
+      if (root.dataset.spInit) return;
+      root.dataset.spInit = "true";
+      initSignalPortrait(root);
+    });
+  });
+</script>

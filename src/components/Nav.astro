@@ -1,0 +1,91 @@
+---
+import { withBase } from "../lib/paths";
+
+const links = [
+  { href: "/", label: "DIRECTOR" },
+  { href: "/producer", label: "PRODUCER" },
+  { href: "/about", label: "ABOUT" },
+];
+
+const currentPath = Astro.url.pathname;
+const onHome = currentPath === withBase("/");
+---
+
+<header class="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-4 sm:px-8 text-sm tracking-wide">
+  <a
+    href={withBase("/")}
+    class:list={[
+      "font-(family-name:--font-display) text-base hover:opacity-60 transition-opacity",
+      onHome && "underline underline-offset-4",
+    ]}
+  >
+    JUSTIN REID TVEDT
+  </a>
+  {links.map((link) => (
+    <>
+      <span class="text-(--color-muted)">|</span>
+      <a
+        href={withBase(link.href)}
+        class:list={[
+          "hover:opacity-60 transition-opacity",
+          currentPath.startsWith(withBase(link.href)) && link.href !== "/" && "underline underline-offset-4",
+          link.href === "/" && onHome && "underline underline-offset-4",
+        ]}
+      >
+        {link.label}
+      </a>
+    </>
+  ))}
+  <span class="text-(--color-muted)">|</span>
+  <div class="flex items-center gap-3 ml-1">
+    <a href="https://www.linkedin.com/in/justinreidtvedt" aria-label="LinkedIn" class="hover:opacity-60 transition-opacity" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/justinreidtvedt/" aria-label="Instagram" class="hover:opacity-60 transition-opacity" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="mailto:justinreidtvedt@gmail.com" aria-label="Email" class="hover:opacity-60 transition-opacity">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+    </a>
+  </div>
+  <span class="hidden font-(family-name:--font-mono) text-xs text-(--color-muted) sm:ml-auto sm:block" data-coords>
+    41.8781°N&nbsp;&nbsp;87.6298°W
+  </span>
+  <span class="hidden font-(family-name:--font-mono) text-xs text-(--color-muted) sm:block" data-nav-timecode>
+    00:00:00:00
+  </span>
+</header>
+
+<script>
+  const NAV_TC_FPS = 24;
+  function formatNavTimecode(seconds: number): string {
+    const totalFrames = Math.floor(seconds * NAV_TC_FPS);
+    const h = Math.floor(totalFrames / (NAV_TC_FPS * 3600));
+    const m = Math.floor((totalFrames / (NAV_TC_FPS * 60)) % 60);
+    const s = Math.floor((totalFrames / NAV_TC_FPS) % 60);
+    const f = Math.floor(totalFrames % NAV_TC_FPS);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+  }
+
+  let navTimecodeStarted = false;
+  function startNavTimecode() {
+    if (navTimecodeStarted) return;
+    navTimecodeStarted = true;
+    const start = performance.now();
+    function tick() {
+      const elements = document.querySelectorAll<HTMLElement>("[data-nav-timecode]");
+      if (elements.length === 0) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      const seconds = (performance.now() - start) / 1000;
+      const text = formatNavTimecode(seconds);
+      elements.forEach((el) => (el.textContent = text));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  startNavTimecode();
+</script>

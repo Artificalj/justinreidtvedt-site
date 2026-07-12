@@ -1,0 +1,70 @@
+---
+import { getEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import VideoPlayer from "../../components/VideoPlayer.astro";
+
+const project = await getEntry("projects", "local-h-lifers");
+if (!project) throw new Error("local-h-lifers project entry not found");
+
+const { title, client } = project.data;
+
+const tourDates = [
+  { date: "Oct 15, 2024", city: "Chicago, IL", venue: "Music Box Theatre", soldOut: true },
+  { date: "Feb 12, 2025", city: "Milwaukee, WI", venue: "Oriental Theatre", soldOut: false },
+  { date: "Mar 5, 2025", city: "St. Louis, MO", venue: "Arkadin Cinema & Bar", soldOut: true },
+  { date: "Mar 10, 2025", city: "Portland, OR", venue: "Clinton Street Theater", soldOut: false },
+  { date: "Mar 11, 2025", city: "Montclair, NJ", venue: "The Clairidge", soldOut: false },
+  { date: "Mar 12, 2025", city: "Philadelphia, PA", venue: "Philadelphia Film Society", soldOut: false },
+  { date: "Mar 13, 2025", city: "Brookline, MA", venue: "Coolidge Corner Theatre", soldOut: false },
+  { date: "Apr 7, 2025", city: "Kansas City, MO", venue: "Screenland Armour", soldOut: false },
+  { date: "Apr 8, 2025", city: "Des Moines, IA", venue: "The Varsity Cinema", soldOut: false },
+  { date: "Aug 16, 2025", city: "Chicago, IL", venue: "ChiTown Drive-In", soldOut: false },
+];
+
+const credits = [
+  { role: "Directed by", name: "Scott Lucas" },
+  { role: "Produced by", name: "Justin Reid Tvedt, Felix Pinero" },
+];
+---
+
+<Layout title={title}>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:px-8">
+    <VideoPlayer src={project.data.fullVideoSrc ?? project.data.videoSrc} poster={project.data.thumbnail} title={title} />
+    <div class="pt-4">
+      <h1 class="font-(family-name:--font-display) text-2xl">
+        {client ? `${client}: ${title}` : title}
+      </h1>
+      <div class="flex flex-col gap-0.5">
+        {credits.map((c) => (
+          <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">{c.role} {c.name}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-12 bg-(--color-paper) py-12 px-4 sm:px-8">
+    <div class="mx-auto max-w-2xl">
+      <p class="font-(family-name:--font-mono) text-center text-sm tracking-[0.15em] text-(--color-ink) leading-relaxed">
+        NO STREAMING. NO VOD.<br />
+        <span class="text-(--color-signal-dim)">YOU HAD TO BE THERE.</span>
+      </p>
+      <p class="mt-3 text-center font-(family-name:--font-mono) text-[11px] tracking-[0.1em] text-(--color-muted)">
+        ONLY IN THEATERS — SCREENED LIVE, WITH AN AUDIENCE.
+      </p>
+
+      <div class="mt-10 border-t border-black/10">
+        {tourDates.map((show) => (
+          <div class="flex items-center justify-between gap-4 border-b border-black/10 py-3 font-(family-name:--font-mono) text-xs tracking-wide text-(--color-ink)/80">
+            <span class="w-24 shrink-0 text-(--color-muted)">{show.date}</span>
+            <span class="flex-1">
+              {show.city} <span class="text-(--color-muted)">/ {show.venue}</span>
+            </span>
+            {show.soldOut && (
+              <span class="shrink-0 font-semibold text-(--color-signal-dim)">SOLD OUT</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>

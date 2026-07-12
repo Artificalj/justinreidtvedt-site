@@ -1,0 +1,199 @@
+---
+import { withBase } from "../lib/paths";
+
+interface Props {
+  src: string;
+  poster?: string;
+  title: string;
+  fps?: number;
+}
+
+const { src, poster, title, fps = 24 } = Astro.props;
+---
+
+<div
+  class="video-player group relative w-full overflow-hidden bg-black transition-transform duration-700 ease-out"
+  style="aspect-ratio: 16 / 9;"
+  data-fps={fps}
+>
+  <video
+    class="vp-video h-full w-full"
+    src={withBase(src)}
+    poster={poster && withBase(poster)}
+    title={title}
+    playsinline
+    preload="metadata"
+  ></video>
+
+  <button class="vp-bigplay absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity" aria-label="Play video">
+    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-black">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </span>
+  </button>
+
+  <div class="vp-controls absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/80 to-transparent px-3 py-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+    <button class="vp-playpause shrink-0 text-white" aria-label="Play/Pause">
+      <svg class="vp-icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="vp-icon-pause hidden" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+
+    <span class="vp-time shrink-0 font-(family-name:--font-mono) text-xs text-white/80 tabular-nums">00:00:00:00</span>
+
+    <div class="vp-bar-wrap relative flex-1 cursor-pointer py-2">
+      <div class="vp-bar-track h-1 w-full rounded-full bg-white/30">
+        <div class="vp-bar-fill h-1 w-0 rounded-full bg-(--color-signal)"></div>
+      </div>
+      <div class="vp-bar-hover pointer-events-none absolute -top-6 hidden -translate-x-1/2 rounded bg-black/80 px-1.5 py-0.5 font-(family-name:--font-mono) text-[11px] text-white">00:00:00:00</div>
+    </div>
+
+    <span class="vp-duration shrink-0 font-(family-name:--font-mono) text-xs text-white/80 tabular-nums">00:00:00:00</span>
+
+    <button class="vp-mute shrink-0 text-white" aria-label="Mute/Unmute">
+      <svg class="vp-icon-vol" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 9v6h4l5 5V4L9 9H5z"/></svg>
+      <svg class="vp-icon-mute hidden" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 9v6h4l5 5V4L9 9H5zm11.5 3-2.3-2.3-1 1L15.5 13l-2.3 2.3 1 1L16 14l2.3 2.3 1-1L17 13l2.3-2.3-1-1L16 12z"/></svg>
+    </button>
+
+    <button class="vp-fullscreen shrink-0 text-white" aria-label="Fullscreen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  function formatTimecode(seconds: number, fps: number): string {
+    if (!Number.isFinite(seconds) || seconds < 0) return "00:00:00:00";
+    const totalFrames = Math.floor(seconds * fps);
+    const h = Math.floor(totalFrames / (fps * 3600));
+    const m = Math.floor((totalFrames / (fps * 60)) % 60);
+    const s = Math.floor((totalFrames / fps) % 60);
+    const f = Math.floor(totalFrames % fps);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+  }
+
+  let activeVideoCount = 0;
+
+  function setCinemaMode(active: boolean) {
+    activeVideoCount = Math.max(0, activeVideoCount + (active ? 1 : -1));
+    document.documentElement.dataset.cinema = activeVideoCount > 0 ? "true" : "false";
+  }
+
+  function initPlayer(root: HTMLElement) {
+    const fps = Number(root.dataset.fps) || 24;
+    const video = root.querySelector(".vp-video") as HTMLVideoElement;
+    const bigPlay = root.querySelector(".vp-bigplay") as HTMLButtonElement;
+    const playPause = root.querySelector(".vp-playpause") as HTMLButtonElement;
+    const iconPlay = root.querySelector(".vp-icon-play") as HTMLElement;
+    const iconPause = root.querySelector(".vp-icon-pause") as HTMLElement;
+    const time = root.querySelector(".vp-time") as HTMLElement;
+    const duration = root.querySelector(".vp-duration") as HTMLElement;
+    const barWrap = root.querySelector(".vp-bar-wrap") as HTMLElement;
+    const barFill = root.querySelector(".vp-bar-fill") as HTMLElement;
+    const barHover = root.querySelector(".vp-bar-hover") as HTMLElement;
+    const mute = root.querySelector(".vp-mute") as HTMLButtonElement;
+    const iconVol = root.querySelector(".vp-icon-vol") as HTMLElement;
+    const iconMute = root.querySelector(".vp-icon-mute") as HTMLElement;
+    const fullscreen = root.querySelector(".vp-fullscreen") as HTMLButtonElement;
+
+    function togglePlay() {
+      if (video.paused) video.play();
+      else video.pause();
+    }
+
+    function syncPlayState() {
+      const playing = !video.paused && !video.ended;
+      iconPlay.classList.toggle("hidden", playing);
+      iconPause.classList.toggle("hidden", !playing);
+      bigPlay.classList.toggle("opacity-0", playing);
+      bigPlay.classList.toggle("pointer-events-none", playing);
+      root.classList.toggle("is-cinema", playing);
+      root.classList.toggle("shadow-[0_0_80px_rgba(255,176,32,0.35)]", playing);
+    }
+
+    let wasPlaying = false;
+    bigPlay.addEventListener("click", togglePlay);
+    playPause.addEventListener("click", togglePlay);
+    video.addEventListener("play", () => {
+      syncPlayState();
+      if (!wasPlaying) setCinemaMode(true);
+      wasPlaying = true;
+    });
+    video.addEventListener("pause", () => {
+      syncPlayState();
+      if (wasPlaying) setCinemaMode(false);
+      wasPlaying = false;
+    });
+    video.addEventListener("ended", () => {
+      syncPlayState();
+      if (wasPlaying) setCinemaMode(false);
+      wasPlaying = false;
+    });
+
+    function syncDuration() {
+      if (Number.isFinite(video.duration)) {
+        duration.textContent = formatTimecode(video.duration, fps);
+      }
+    }
+
+    video.addEventListener("loadedmetadata", syncDuration);
+    video.addEventListener("durationchange", syncDuration);
+    if (Number.isFinite(video.duration)) syncDuration();
+
+    video.addEventListener("timeupdate", () => {
+      time.textContent = formatTimecode(video.currentTime, fps);
+      if (Number.isFinite(video.duration)) {
+        barFill.style.width = `${(video.currentTime / video.duration) * 100}%`;
+        if (duration.textContent === "00:00:00:00") syncDuration();
+      }
+    });
+
+    function seekFromEvent(e: MouseEvent) {
+      const rect = barWrap.getBoundingClientRect();
+      const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      return ratio;
+    }
+
+    barWrap.addEventListener("click", (e) => {
+      if (!video.duration) return;
+      video.currentTime = seekFromEvent(e) * video.duration;
+    });
+
+    barWrap.addEventListener("mousemove", (e) => {
+      if (!video.duration) return;
+      const ratio = seekFromEvent(e);
+      const rect = barWrap.getBoundingClientRect();
+      barHover.style.left = `${e.clientX - rect.left}px`;
+      barHover.textContent = formatTimecode(ratio * video.duration, fps);
+      barHover.classList.remove("hidden");
+    });
+
+    barWrap.addEventListener("mouseleave", () => {
+      barHover.classList.add("hidden");
+    });
+
+    mute.addEventListener("click", () => {
+      video.muted = !video.muted;
+      iconVol.classList.toggle("hidden", video.muted);
+      iconMute.classList.toggle("hidden", !video.muted);
+    });
+
+    fullscreen.addEventListener("click", () => {
+      if (root.requestFullscreen) root.requestFullscreen();
+    });
+
+    syncPlayState();
+  }
+
+  document.addEventListener("astro:before-swap", () => {
+    activeVideoCount = 0;
+    document.documentElement.dataset.cinema = "false";
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>(".video-player").forEach((root) => {
+      if (root.dataset.vpInit) return;
+      root.dataset.vpInit = "true";
+      initPlayer(root);
+    });
+  });
+</script>

@@ -1,0 +1,16 @@
+{
+  "title": "Amanda Kloots",
+  "client": "Vital Proteins",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/vital-proteins-amanda-kloots.jpg",
+  "videoSrc": "/video/placeholder/vital-proteins-amanda-kloots.mp4",
+  "order": 11,
+  "fullVideoSrc": "/video/full/vital-proteins-amanda-kloots.mp4",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}

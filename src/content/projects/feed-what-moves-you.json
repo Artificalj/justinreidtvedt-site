@@ -1,0 +1,16 @@
+{
+  "title": "Feed What Moves You",
+  "client": "Vital Proteins",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/feed-what-moves-you.jpg",
+  "videoSrc": "/video/placeholder/feed-what-moves-you.mp4",
+  "order": 1,
+  "fullVideoSrc": "/video/full/feed-what-moves-you.mp4",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}

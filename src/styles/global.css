@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/instrument-serif-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/instrument-serif-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/archivo-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/archivo-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/archivo-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bodoni Moda";
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bodoni-moda-500-italic.woff2") format("woff2");
+}
+
+@theme {
+  --font-sans: "Archivo", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+  --font-wordmark: "Bodoni Moda", "Didot", "Times New Roman", serif;
+
+  --color-ink: #0b0b0c;
+  --color-paper: #f6f5f2;
+  --color-muted: #6b6b6b;
+  --color-line: #e2e0da;
+
+  --color-void: #050505;
+  --color-void-line: #29281f;
+  --color-signal: #ffb020;
+  --color-signal-dim: #7a5215;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.7s ease, color 0.7s ease;
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-ink);
+}
+
+html[data-cinema="true"] body {
+  background: var(--color-void);
+  color: #e8e6df;
+}
+
+.scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.signal-scroll-track {
+  animation: signal-scroll 12s linear infinite;
+}
+
+@keyframes signal-scroll {
+  from {
+    transform: translateY(0%);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.tv-lines {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.13) 0px,
+      rgba(255, 255, 255, 0.13) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+.signal-roll-band {
+  height: 18%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.09) 45%,
+    rgba(255, 255, 255, 0.09) 55%,
+    transparent
+  );
+  animation: signal-roll 5s linear infinite;
+}
+
+@keyframes signal-roll {
+  from {
+    top: -20%;
+  }
+  to {
+    top: 120%;
+  }
+}
+
+.cinema-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--color-void);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+
+html[data-cinema="true"] .cinema-backdrop {
+  opacity: 0.96;
+  pointer-events: auto;
+}
+
+.video-player.is-cinema {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 50;
+  width: min(92vw, calc(86vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.grain-overlay {
+  position: fixed;
+  inset: -10%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: var(--grain-opacity, 0.05);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grain-drift var(--grain-duration, 8s) steps(8) infinite;
+  transition: opacity 0.4s ease-out;
+}
+
+@keyframes grain-drift {
+  0% { transform: translate(0, 0); }
+  12.5% { transform: translate(-2%, 3%); }
+  25% { transform: translate(3%, -2%); }
+  37.5% { transform: translate(-3%, -3%); }
+  50% { transform: translate(2%, 2%); }
+  62.5% { transform: translate(-1%, 4%); }
+  75% { transform: translate(4%, -1%); }
+  87.5% { transform: translate(-2%, -4%); }
+  100% { transform: translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay {
+    animation: none;
+  }
+}

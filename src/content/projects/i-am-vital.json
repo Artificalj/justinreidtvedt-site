@@ -1,0 +1,16 @@
+{
+  "title": "I Am Vital",
+  "client": "Vital Proteins",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/i-am-vital.jpg",
+  "videoSrc": "/video/placeholder/i-am-vital.mp4",
+  "order": 16,
+  "fullVideoSrc": "/video/full/i-am-vital.mp4",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}

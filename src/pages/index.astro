@@ -1,0 +1,20 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import ProjectGrid from "../components/ProjectGrid.astro";
+import CategoryFilter from "../components/CategoryFilter.astro";
+import HeroReel from "../components/HeroReel.astro";
+
+const allProjects = await getCollection("projects");
+const projects = allProjects
+  .filter((p) => p.data.roles.includes("Director"))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout title="Director">
+  <HeroReel reel={projects} />
+  <div class="mt-16 sm:mt-24">
+    <CategoryFilter projects={projects} />
+    <ProjectGrid projects={projects} />
+  </div>
+</Layout>

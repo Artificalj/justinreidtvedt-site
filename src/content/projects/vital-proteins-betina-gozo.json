@@ -1,0 +1,16 @@
+{
+  "title": "Betina Gozo",
+  "client": "Vital Proteins",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/vital-proteins-betina-gozo.jpg",
+  "videoSrc": "/video/placeholder/vital-proteins-betina-gozo.mp4",
+  "order": 12,
+  "fullVideoSrc": "/video/full/vital-proteins-betina-gozo.mp4",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}

@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import VideoPlayer from "../../components/VideoPlayer.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { title, client, roles, director, additionalProducers } = project.data;
+
+const directorName = director ?? (roles.includes("Director") ? "Justin Reid Tvedt" : undefined);
+const producerNames = roles.includes("Producer")
+  ? ["Justin Reid Tvedt", ...(additionalProducers ?? [])]
+  : additionalProducers ?? [];
+const hasCredits = Boolean(directorName) || producerNames.length > 0;
+---
+
+<Layout title={title}>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:px-8">
+    <VideoPlayer src={project.data.fullVideoSrc ?? project.data.videoSrc} poster={project.data.thumbnail} title={title} />
+    <div class="pt-4">
+      <h1 class="font-(family-name:--font-display) text-2xl">
+        {client ? `${client}: ${title}` : title}
+      </h1>
+      {hasCredits ? (
+        <div class="flex flex-col gap-0.5">
+          {directorName && (
+            <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">Directed by {directorName}</p>
+          )}
+          {producerNames.length > 0 && (
+            <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">Produced by {producerNames.join(", ")}</p>
+          )}
+          {roles.includes("Editor") && (
+            <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">Edited by Justin Reid Tvedt</p>
+          )}
+        </div>
+      ) : (
+        <p class="font-(family-name:--font-mono) text-xs text-(--color-muted)">Roles: {roles.join(", ")}</p>
+      )}
+    </div>
+  </div>
+</Layout>

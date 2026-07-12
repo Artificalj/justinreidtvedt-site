@@ -1,0 +1,18 @@
+{
+  "title": "Uncap Your Potential",
+  "client": "Vital Proteins",
+  "roles": [
+    "Director",
+    "Producer"
+  ],
+  "category": "commercial",
+  "thumbnail": "/images/projects/uncap-your-potential.jpg",
+  "videoSrc": "/video/placeholder/uncap-your-potential.mp4",
+  "order": 2,
+  "fullVideoSrc": "/video/full/uncap-your-potential.mp4",
+  "heroSrc": "/video/placeholder/uncap-your-potential-billboard.mp4",
+  "heroPoster": "/images/projects/uncap-your-potential-billboard.jpg",
+  "additionalProducers": [
+    "Felix Pinero"
+  ]
+}
