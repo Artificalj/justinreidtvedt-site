@@ -12,5 +12,7 @@
   "fullVideoSrc": "/video/full/vital-proteins-amanda-kloots.mp4",
   "additionalProducers": [
     "Felix Pinero"
-  ]
+  ],
+  "heroSrc": "/video/hero/vital-proteins-amanda-kloots.mp4",
+  "heroPoster": "/images/projects/hero-posters/vital-proteins-amanda-kloots.jpg"
 }

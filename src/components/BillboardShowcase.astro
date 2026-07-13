@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { heroSrc, heroPoster, heroObjectPosition, format, client, placement } = project.data;
+---
+
+{heroSrc && (
+  <div class="billboard-showcase w-full">
+    <div class="w-full overflow-hidden bg-(--color-void)">
+      <video
+        class="h-full w-full"
+        style={`object-fit: contain; object-position: ${heroObjectPosition ?? "center"};`}
+        src={withBase(heroSrc)}
+        poster={heroPoster && withBase(heroPoster)}
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 font-(family-name:--font-mono) text-[11px] tracking-[0.15em] text-(--color-muted)">
+      <span>
+        {format?.toUpperCase() ?? "DIGITAL BILLBOARD"}
+        {client && <span> — {client.toUpperCase()}</span>}
+      </span>
+      {placement && <span>{placement}</span>}
+    </div>
+  </div>
+)}
+
+<script>
+  // Source cuts often end on a broadcast fade-to-black. Restart each loop
+  // just before the true end so that tail never gets a chance to render.
+  const LOOP_FADE_GUARD = 0.4;
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLVideoElement>(".billboard-showcase video").forEach((video) => {
+      if (video.dataset.loopInit) return;
+      video.dataset.loopInit = "true";
+      video.addEventListener("timeupdate", () => {
+        if (video.duration && video.currentTime >= video.duration - LOOP_FADE_GUARD) {
+          video.currentTime = 0;
+        }
+      });
+    });
+  });
+</script>

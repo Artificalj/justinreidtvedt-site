@@ -1,0 +1,42 @@
+---
+---
+
+<footer class="mt-16 flex flex-wrap items-center justify-between gap-2 border-t border-(--color-line) px-4 py-4 font-(family-name:--font-mono) text-xs text-(--color-muted) sm:px-8">
+  <span>41.8781°N&nbsp;&nbsp;87.6298°W</span>
+  <span data-footer-timecode>0:00:00:00</span>
+</footer>
+
+<script>
+  // Jan 28, 1980, 3:05 AM CST (Sioux Falls, SD) = 09:05 UTC — no DST in January.
+  const BIRTH_MS = Date.UTC(1980, 0, 28, 9, 5, 0);
+
+  function formatAge(nowMs: number): string {
+    const totalSeconds = Math.floor((nowMs - BIRTH_MS) / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const secsToday = totalSeconds % 86400;
+    const h = Math.floor(secsToday / 3600);
+    const m = Math.floor((secsToday % 3600) / 60);
+    const s = secsToday % 60;
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${days}:${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  let footerTimecodeStarted = false;
+  function startFooterTimecode() {
+    if (footerTimecodeStarted) return;
+    footerTimecodeStarted = true;
+    function tick() {
+      const elements = document.querySelectorAll<HTMLElement>("[data-footer-timecode]");
+      if (elements.length === 0) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      const text = formatAge(Date.now());
+      elements.forEach((el) => (el.textContent = text));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  startFooterTimecode();
+</script>

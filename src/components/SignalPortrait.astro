@@ -57,9 +57,8 @@ const src = withBase(rawSrc);
     <div class="signal-roll-band pointer-events-none absolute inset-x-0"></div>
   </div>
 
-  <div class="mt-2 flex items-center justify-between font-(family-name:--font-mono) text-xs text-(--color-muted)">
-    <span>41.8781°N&nbsp;&nbsp;87.6298°W</span>
-    <span data-signal-timecode>00:00:00:00</span>
+  <div class="mt-2 flex items-center justify-between gap-3 px-1 font-(family-name:--font-mono) text-xs text-(--color-muted) sm:px-2">
+    <span>166.32°RA&nbsp;&nbsp;43.54°DEC</span>
     <span data-signal-readout>SIG&nbsp;000</span>
   </div>
 </div>
@@ -72,18 +71,6 @@ const src = withBase(rawSrc);
     const turbulence = root.querySelector<SVGFETurbulenceElement>("[data-turbulence]")!;
     const displacement = root.querySelector<SVGFEDisplacementMapElement>("[data-displacement]")!;
     const readout = root.querySelector<HTMLElement>("[data-signal-readout]")!;
-    const timecodeEl = root.querySelector<HTMLElement>("[data-signal-timecode]")!;
-
-    const TC_FPS = 24;
-    function formatTimecode(seconds: number): string {
-      const totalFrames = Math.floor(seconds * TC_FPS);
-      const h = Math.floor(totalFrames / (TC_FPS * 3600));
-      const m = Math.floor((totalFrames / (TC_FPS * 60)) % 60);
-      const s = Math.floor((totalFrames / TC_FPS) % 60);
-      const f = Math.floor(totalFrames % TC_FPS);
-      const pad = (n: number) => n.toString().padStart(2, "0");
-      return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
-    }
 
     let lastX = 0;
     let lastY = 0;
@@ -140,7 +127,6 @@ const src = withBase(rawSrc);
       warmLayers.forEach((el) => (el.style.opacity = warmCoolOpacity));
       coolLayers.forEach((el) => (el.style.opacity = warmCoolOpacity));
       readout.textContent = `SIG ${Math.round(combined * 999).toString().padStart(3, "0")}`;
-      timecodeEl.textContent = formatTimecode(t);
 
       distortTarget.style.setProperty("--px", "0px");
       distortTarget.style.setProperty("--ab", `${abOffset}px`);

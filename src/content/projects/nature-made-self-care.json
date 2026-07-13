@@ -8,5 +8,7 @@
   "thumbnail": "/images/projects/nature-made-self-care.jpg",
   "videoSrc": "/video/placeholder/nature-made-self-care.mp4",
   "order": 14,
-  "fullVideoSrc": "/video/full/nature-made-self-care.mp4"
+  "fullVideoSrc": "/video/full/nature-made-self-care.mp4",
+  "heroSrc": "/video/hero/nature-made-self-care.mp4",
+  "heroPoster": "/images/projects/hero-posters/nature-made-self-care.jpg"
 }

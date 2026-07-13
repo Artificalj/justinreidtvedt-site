@@ -8,5 +8,7 @@
   "thumbnail": "/images/projects/nature-made-nurturing-moments.jpg",
   "videoSrc": "/video/placeholder/nature-made-nurturing-moments.mp4",
   "order": 13,
-  "fullVideoSrc": "/video/full/nature-made-nurturing-moments.mp4"
+  "fullVideoSrc": "/video/full/nature-made-nurturing-moments.mp4",
+  "heroSrc": "/video/hero/nature-made-nurturing-moments.mp4",
+  "heroPoster": "/images/projects/hero-posters/nature-made-nurturing-moments.jpg"
 }

@@ -12,5 +12,7 @@
   "fullVideoSrc": "/video/full/feed-what-moves-you.mp4",
   "additionalProducers": [
     "Felix Pinero"
-  ]
+  ],
+  "heroSrc": "/video/hero/feed-what-moves-you.mp4",
+  "heroPoster": "/images/projects/hero-posters/feed-what-moves-you.jpg"
 }

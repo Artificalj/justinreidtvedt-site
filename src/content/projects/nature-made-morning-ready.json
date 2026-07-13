@@ -8,5 +8,7 @@
   "thumbnail": "/images/projects/nature-made-morning-ready.jpg",
   "videoSrc": "/video/placeholder/nature-made-morning-ready.mp4",
   "order": 3,
-  "fullVideoSrc": "/video/full/nature-made-morning-ready.mp4"
+  "fullVideoSrc": "/video/full/nature-made-morning-ready.mp4",
+  "heroSrc": "/video/hero/nature-made-morning-ready.mp4",
+  "heroPoster": "/images/projects/hero-posters/nature-made-morning-ready.jpg"
 }

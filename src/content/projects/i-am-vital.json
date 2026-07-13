@@ -12,5 +12,7 @@
   "fullVideoSrc": "/video/full/i-am-vital.mp4",
   "additionalProducers": [
     "Felix Pinero"
-  ]
+  ],
+  "heroSrc": "/video/hero/i-am-vital.mp4",
+  "heroPoster": "/images/projects/hero-posters/i-am-vital.jpg"
 }

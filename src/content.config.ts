@@ -15,6 +15,10 @@ const projects = defineCollection({
     fullVideoSrc: z.string().optional(),
     heroSrc: z.string().optional(),
     heroPoster: z.string().optional(),
+    heroObjectPosition: z.string().optional(),
+    heroFit: z.enum(["cover", "contain"]).optional(),
+    format: z.string().optional(),
+    placement: z.string().optional(),
     order: z.number().default(0),
   }),
 });

@@ -9,5 +9,7 @@
   "thumbnail": "/images/projects/choose-chicago.jpg",
   "videoSrc": "/video/placeholder/choose-chicago.mp4",
   "order": 5,
-  "fullVideoSrc": "/video/full/choose-chicago.mp4"
+  "fullVideoSrc": "/video/full/choose-chicago.mp4",
+  "heroSrc": "/video/hero/choose-chicago.mp4",
+  "heroPoster": "/images/projects/hero-posters/choose-chicago.jpg"
 }

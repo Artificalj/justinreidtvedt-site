@@ -4,31 +4,44 @@ import { withBase } from "../lib/paths";
 
 interface Props {
   reel: CollectionEntry<"projects">[];
+  role?: string;
 }
 
-const { reel } = Astro.props;
+const { reel, role = "DIRECTOR" } = Astro.props;
 const reelData = reel.map((p) => ({
   src: withBase(p.data.heroSrc ?? p.data.videoSrc),
   poster: withBase(p.data.heroPoster ?? p.data.thumbnail),
   title: p.data.title,
+  format: p.data.format ?? null,
+  objectPosition: p.data.heroObjectPosition ?? "center",
+  objectFit: p.data.heroFit ?? "cover",
+  frame: p.data.heroFit === "contain" ? "paper" : "void",
 }));
 const first = reelData[0];
+const firstLabel = first.format
+  ? `${first.format.toUpperCase()} — ${first.title.toUpperCase()}`
+  : first.title.toUpperCase();
 ---
 
-<section class="relative h-[78vh] min-h-[420px] w-full overflow-hidden bg-(--color-void)" data-hero>
-  <div class="absolute inset-0" style="transform: translate(var(--hero-px, 0px), var(--hero-py, 0px));" data-hero-parallax>
+<section
+  class="hero relative h-[78vh] min-h-[420px] w-full overflow-hidden transition-colors duration-700"
+  data-hero
+  data-frame={first.frame}
+>
+  <div class="absolute -inset-2" data-hero-parallax style="transform: translate(var(--hero-px, 0px), var(--hero-py, 0px));">
     <video
-      class="hero-layer absolute inset-0 h-full w-full object-cover opacity-90"
+      class="hero-layer absolute inset-0 h-full w-full opacity-90 transition-opacity duration-500 ease-in-out"
       data-layer="a"
       src={first.src}
       poster={first.poster}
+      style={`object-fit: ${first.objectFit}; object-position: ${first.objectPosition}; background-color: var(${first.frame === "paper" ? "--color-paper" : "--color-void"});`}
       autoplay
       muted
       loop
       playsinline
     ></video>
     <video
-      class="hero-layer absolute inset-0 h-full w-full object-cover opacity-0"
+      class="hero-layer absolute inset-0 h-full w-full opacity-0 transition-opacity duration-500 ease-in-out"
       data-layer="b"
       muted
       loop
@@ -36,29 +49,90 @@ const first = reelData[0];
     ></video>
   </div>
 
-  <div class="scanlines pointer-events-none absolute inset-0 opacity-60"></div>
+  <div class="hero-dip absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-hero-dip></div>
 
-  <div class="absolute inset-0 bg-gradient-to-t from-(--color-void)/80 via-transparent to-(--color-void)/20"></div>
+  <div class="hero-scrim absolute inset-0"></div>
 
   <div class="absolute inset-0 flex flex-col items-start justify-end px-4 pb-10 sm:px-8">
-    <h1 class="font-(family-name:--font-wordmark) text-[clamp(2.5rem,8vw,6.5rem)] italic leading-[0.95] tracking-wide text-white">
+    <h1
+      class="hero-title font-(family-name:--font-wordmark) text-[clamp(2.5rem,8vw,6.5rem)] italic leading-[0.95] tracking-wide"
+    >
       Justın Reıd Tvedt
     </h1>
-    <div class="mt-3 flex items-center gap-3 font-(family-name:--font-mono) text-xs tracking-[0.2em] text-white/70">
-      <span>DIRECTOR&nbsp;&nbsp;/&nbsp;&nbsp;CHICAGO</span>
-      <span class="text-white/30">—</span>
-      <span data-hero-label>{first.title.toUpperCase()}</span>
+    <div
+      class="hero-meta mt-3 flex flex-wrap items-center gap-3 font-(family-name:--font-mono) text-xs tracking-[0.2em]"
+    >
+      <span>{role}</span>
+      <span class="hero-meta-muted">—</span>
+      <span data-hero-label>{firstLabel}</span>
     </div>
   </div>
 
   <script type="application/json" data-reel-json set:html={JSON.stringify(reelData)}></script>
 </section>
 
+<style>
+  .hero {
+    background-color: var(--color-void);
+  }
+  .hero[data-frame="paper"] {
+    background-color: var(--color-paper);
+  }
+
+  .hero-dip {
+    background-color: var(--color-void);
+  }
+
+  .hero-scrim {
+    background-image: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-void) 80%, transparent),
+      transparent,
+      color-mix(in srgb, var(--color-void) 20%, transparent)
+    );
+    transition: background-image 0.7s ease-out;
+  }
+  .hero[data-frame="paper"] .hero-scrim {
+    background-image: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-paper) 90%, transparent),
+      transparent,
+      transparent
+    );
+  }
+
+  .hero-title,
+  .hero-meta {
+    color: white;
+    transition: color 0.7s ease-out;
+  }
+  .hero-meta-muted {
+    color: rgb(255 255 255 / 0.3);
+  }
+  .hero-meta {
+    color: rgb(255 255 255 / 0.7);
+  }
+  .hero[data-frame="paper"] .hero-title,
+  .hero[data-frame="paper"] .hero-meta {
+    color: var(--color-void);
+  }
+  .hero[data-frame="paper"] .hero-meta {
+    color: color-mix(in srgb, var(--color-void) 70%, transparent);
+  }
+  .hero[data-frame="paper"] .hero-meta-muted {
+    color: color-mix(in srgb, var(--color-void) 30%, transparent);
+  }
+</style>
+
 <script>
   interface ReelItem {
     src: string;
     poster: string;
     title: string;
+    format: string | null;
+    objectPosition: string;
+    objectFit: string;
+    frame: string;
   }
 
   function initHeroParallax(root: HTMLElement) {
@@ -97,13 +171,36 @@ const first = reelData[0];
     };
   }
 
+  // Source cuts often end on a broadcast fade-to-black. Restart each loop just
+  // before the true end so that tail never gets a chance to render.
+  const LOOP_FADE_GUARD = 0.4;
+
+  function installSeamlessLoop(video: HTMLVideoElement) {
+    video.addEventListener("timeupdate", () => {
+      if (video.duration && video.currentTime >= video.duration - LOOP_FADE_GUARD) {
+        video.currentTime = 0;
+      }
+    });
+  }
+
+  // Cutting through a solid dip (rather than dissolving two clips directly
+  // into each other) hides the letterbox/frame-color change between clips
+  // and keeps every transition looking identical regardless of what's
+  // adjacent. DIP_HOLD_MS is a floor, not a fixed delay — the incoming clip
+  // preloads in parallel, so a slow network extends the black hold instead
+  // of revealing a half-loaded frame.
+  const DIP_HOLD_MS = 450;
+
   function initHero(root: HTMLElement) {
     const json = root.querySelector<HTMLScriptElement>("[data-reel-json]")!;
     const reel: ReelItem[] = JSON.parse(json.textContent || "[]");
     const layerA = root.querySelector<HTMLVideoElement>('[data-layer="a"]')!;
     const layerB = root.querySelector<HTMLVideoElement>('[data-layer="b"]')!;
+    const dip = root.querySelector<HTMLElement>("[data-hero-dip]")!;
     const label = root.querySelector<HTMLElement>("[data-hero-label]")!;
     const cleanupParallax = initHeroParallax(root);
+    installSeamlessLoop(layerA);
+    installSeamlessLoop(layerB);
 
     let activeLayer = layerA;
     let idleLayer = layerB;
@@ -112,25 +209,50 @@ const first = reelData[0];
     let lockedCategory: string | null = null;
     let lockedItem: ReelItem | null = null;
     let isPreviewing = false;
+    let showToken = 0;
 
     function showItem(item: ReelItem) {
+      const token = ++showToken;
       const incoming = idleLayer;
       const outgoing = activeLayer;
+      [activeLayer, idleLayer] = [incoming, outgoing];
 
-      const reveal = () => {
-        incoming.removeEventListener("canplay", reveal);
-        incoming.classList.remove("opacity-0");
-        outgoing.classList.add("opacity-0");
-      };
+      dip.classList.remove("opacity-0");
+      outgoing.classList.add("opacity-0");
+      root.dataset.frame = "void";
 
       incoming.poster = item.poster;
       incoming.src = item.src;
-      incoming.addEventListener("canplay", reveal, { once: true });
+      incoming.style.objectFit = item.objectFit ?? "cover";
+      incoming.style.objectPosition = item.objectPosition ?? "center";
+      incoming.style.backgroundColor = `var(${item.frame === "paper" ? "--color-paper" : "--color-void"})`;
       incoming.load();
       incoming.play().catch(() => {});
 
-      [activeLayer, idleLayer] = [incoming, outgoing];
-      label.textContent = item.title.toUpperCase();
+      let dipDone = false;
+      let clipReady = false;
+
+      const reveal = () => {
+        if (!dipDone || !clipReady || token !== showToken) return;
+        incoming.removeEventListener("canplay", onCanPlay);
+        root.dataset.frame = item.frame ?? "void";
+        incoming.classList.remove("opacity-0");
+        dip.classList.add("opacity-0");
+        label.textContent = item.format
+          ? `${item.format.toUpperCase()} — ${item.title.toUpperCase()}`
+          : item.title.toUpperCase();
+      };
+
+      const onCanPlay = () => {
+        clipReady = true;
+        reveal();
+      };
+
+      setTimeout(() => {
+        dipDone = true;
+        reveal();
+      }, DIP_HOLD_MS);
+      incoming.addEventListener("canplay", onCanPlay);
     }
 
     function startIdleCycle() {

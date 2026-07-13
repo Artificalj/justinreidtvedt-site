@@ -5,10 +5,15 @@
     "Director",
     "Producer"
   ],
-  "additionalProducers": ["Felix Pinero", "Tony Mendoza"],
+  "additionalProducers": [
+    "Felix Pinero",
+    "Tony Mendoza"
+  ],
   "category": "music-video",
   "thumbnail": "/images/projects/nurse-novels.jpg",
   "videoSrc": "/video/placeholder/nurse-novels.mp4",
   "order": 6,
-  "fullVideoSrc": "/video/full/nurse-novels.mp4"
+  "fullVideoSrc": "/video/full/nurse-novels.mp4",
+  "heroSrc": "/video/hero/nurse-novels.mp4",
+  "heroPoster": "/images/projects/hero-posters/nurse-novels.jpg"
 }

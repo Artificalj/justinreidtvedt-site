@@ -9,10 +9,15 @@ const allProjects = await getCollection("projects");
 const projects = allProjects
   .filter((p) => p.data.roles.includes("Director"))
   .sort((a, b) => a.data.order - b.data.order);
+
+// Billboard-format ads (ultra-wide, letterboxed) cut jarringly against the
+// full-bleed cover clips in the auto-cycling reel. They get their own
+// showcase on the project detail page instead — see [slug].astro.
+const heroReel = projects.filter((p) => p.data.heroFit !== "contain");
 ---
 
 <Layout title="Director">
-  <HeroReel reel={projects} />
+  <HeroReel reel={heroReel} />
   <div class="mt-16 sm:mt-24">
     <CategoryFilter projects={projects} />
     <ProjectGrid projects={projects} />

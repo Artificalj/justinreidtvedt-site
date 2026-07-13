@@ -9,5 +9,7 @@
   "thumbnail": "/images/projects/microsoft-msc-orchestra.jpg",
   "videoSrc": "/video/placeholder/microsoft-msc-orchestra.mp4",
   "order": 10,
-  "fullVideoSrc": "/video/full/microsoft-msc-orchestra.mp4"
+  "fullVideoSrc": "/video/full/microsoft-msc-orchestra.mp4",
+  "heroSrc": "/video/hero/microsoft-msc-orchestra.mp4",
+  "heroPoster": "/images/projects/hero-posters/microsoft-msc-orchestra.jpg"
 }

@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
+import BillboardShowcase from "../../components/BillboardShowcase.astro";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -45,4 +46,10 @@ const hasCredits = Boolean(directorName) || producerNames.length > 0;
       )}
     </div>
   </div>
+
+  {project.data.heroFit === "contain" && (
+    <div class="mx-auto max-w-5xl px-4 pb-6 sm:px-8">
+      <BillboardShowcase project={project} />
+    </div>
+  )}
 </Layout>

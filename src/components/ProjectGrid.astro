@@ -27,8 +27,11 @@ const sorted = [...projects].sort((a, b) => a.data.order - b.data.order);
         loading="lazy"
       />
       {project.data.client && (
-        <span class="absolute left-4 top-4 font-(family-name:--font-mono) text-[11px] tracking-[0.15em] text-white/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+        <span class="absolute left-4 top-4 flex flex-col font-(family-name:--font-mono) text-[11px] tracking-[0.15em] text-white/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
           {project.data.client.toUpperCase()}
+          {project.data.format && (
+            <span class="text-[10px] text-white/70">{project.data.format.toUpperCase()}</span>
+          )}
         </span>
       )}
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>

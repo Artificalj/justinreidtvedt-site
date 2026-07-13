@@ -70,7 +70,7 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
   --font-wordmark: "Bodoni Moda", "Didot", "Times New Roman", serif;
 
-  --color-ink: #0b0b0c;
+  --color-ink: #14192c;
   --color-paper: #f6f5f2;
   --color-muted: #6b6b6b;
   --color-line: #e2e0da;
@@ -79,6 +79,9 @@
   --color-void-line: #29281f;
   --color-signal: #ffb020;
   --color-signal-dim: #7a5215;
+
+  --color-vermillion: #ae3b22;
+  --color-moonlight: #c7ccd9;
 }
 
 html {
@@ -126,6 +129,24 @@ html[data-cinema="true"] body {
   }
 }
 
+.tv-lines--dense {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.16) 0px,
+      rgba(255, 255, 255, 0.16) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.22) 0px,
+      rgba(255, 255, 255, 0.22) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+}
+
 .tv-lines {
   background-image:
     repeating-linear-gradient(
@@ -153,7 +174,7 @@ html[data-cinema="true"] body {
     rgba(255, 255, 255, 0.09) 55%,
     transparent
   );
-  animation: signal-roll 5s linear infinite;
+  animation: var(--roll-animation, signal-roll) var(--roll-duration, 5s) linear infinite;
 }
 
 @keyframes signal-roll {
@@ -162,6 +183,15 @@ html[data-cinema="true"] body {
   }
   to {
     top: 120%;
+  }
+}
+
+@keyframes signal-roll-reverse {
+  from {
+    top: 120%;
+  }
+  to {
+    top: -20%;
   }
 }
 

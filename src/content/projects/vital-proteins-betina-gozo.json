@@ -12,5 +12,7 @@
   "fullVideoSrc": "/video/full/vital-proteins-betina-gozo.mp4",
   "additionalProducers": [
     "Felix Pinero"
-  ]
+  ],
+  "heroSrc": "/video/hero/vital-proteins-betina-gozo.mp4",
+  "heroPoster": "/images/projects/hero-posters/vital-proteins-betina-gozo.jpg"
 }

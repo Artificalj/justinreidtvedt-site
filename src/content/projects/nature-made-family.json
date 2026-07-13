@@ -8,5 +8,7 @@
   "thumbnail": "/images/projects/nature-made-family.jpg",
   "videoSrc": "/video/placeholder/nature-made-family.mp4",
   "order": 9,
-  "fullVideoSrc": "/video/full/nature-made-family.mp4"
+  "fullVideoSrc": "/video/full/nature-made-family.mp4",
+  "heroSrc": "/video/hero/nature-made-family.mp4",
+  "heroPoster": "/images/projects/hero-posters/nature-made-family.jpg"
 }

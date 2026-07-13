@@ -1,5 +1,5 @@
 {
-  "title": "What Is Matcha",
+  "title": "What Is Matcha: Japan",
   "client": "Vital Proteins",
   "roles": [
     "Director",
@@ -13,5 +13,7 @@
   "fullVideoSrc": "/video/full/vp-matcha.mp4",
   "additionalProducers": [
     "Felix Pinero"
-  ]
+  ],
+  "heroSrc": "/video/hero/vp-matcha.mp4",
+  "heroPoster": "/images/projects/hero-posters/vp-matcha.jpg"
 }
