@@ -95,6 +95,11 @@ const { src, poster, title, fps = 24 } = Astro.props;
     const iconMute = root.querySelector(".vp-icon-mute") as HTMLElement;
     const fullscreen = root.querySelector(".vp-fullscreen") as HTMLButtonElement;
 
+    // Astro's ClientRouter swaps this element in from a parsed document; the
+    // browser's media resource-selection algorithm doesn't run automatically
+    // for src set that way, so currentSrc stays empty until we force it.
+    video.load();
+
     function togglePlay() {
       if (video.paused) video.play();
       else video.pause();

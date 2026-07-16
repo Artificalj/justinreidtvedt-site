@@ -44,6 +44,10 @@ const { heroSrc, heroPoster, heroObjectPosition, format, client, placement } = p
     document.querySelectorAll<HTMLVideoElement>(".billboard-showcase video").forEach((video) => {
       if (video.dataset.loopInit) return;
       video.dataset.loopInit = "true";
+      // Astro's ClientRouter swaps this element in from a parsed document; the
+      // browser's media resource-selection algorithm (and autoplay) doesn't run
+      // automatically for src set that way, so force it.
+      video.load();
       video.addEventListener("timeupdate", () => {
         if (video.duration && video.currentTime >= video.duration - LOOP_FADE_GUARD) {
           video.currentTime = 0;

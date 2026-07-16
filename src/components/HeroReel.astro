@@ -202,6 +202,12 @@ const firstLabel = first.format
     installSeamlessLoop(layerA);
     installSeamlessLoop(layerB);
 
+    // Astro's ClientRouter swaps this element in from a parsed document; the
+    // browser's media resource-selection algorithm (and autoplay) doesn't run
+    // automatically for src set that way, so force it for the first-rendered layer.
+    layerA.load();
+    layerA.play().catch(() => {});
+
     let activeLayer = layerA;
     let idleLayer = layerB;
     let idleIndex = 0;
