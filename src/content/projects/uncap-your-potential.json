@@ -10,11 +10,11 @@
   "videoSrc": "/video/placeholder/uncap-your-potential.mp4",
   "order": 2,
   "fullVideoSrc": "/video/full/uncap-your-potential.mp4",
-  "heroSrc": "/video/placeholder/uncap-your-potential-billboard.mp4",
+  "heroSrc": "/video/hero/uncap-your-potential-billboard.mp4",
   "heroPoster": "/images/projects/uncap-your-potential-billboard.jpg",
   "heroFit": "contain",
   "format": "Digital Billboard",
-  "placement": "Displayed at The Grove, Los Angeles",
+  "placement": "Displayed at The Grove West Hollywood, Los Angeles",
   "additionalProducers": [
     "Felix Pinero"
   ]
