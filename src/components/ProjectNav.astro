@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  prev: CollectionEntry<"projects">;
+  next: CollectionEntry<"projects">;
+}
+
+const { prev, next } = Astro.props;
+---
+
+<div class="mx-auto mt-12 max-w-5xl border-t border-black/10 px-4 py-6 sm:px-8">
+  <div class="flex items-center justify-between gap-4 font-(family-name:--font-mono) text-xs tracking-[0.15em] text-(--color-muted)">
+    <a
+      href={withBase(`/work/${prev.id}`)}
+      class="group flex min-w-0 items-baseline gap-2 hover:opacity-60 transition-opacity"
+    >
+      <span class="shrink-0">←</span>
+      <span class="truncate">{prev.data.title.toUpperCase()}</span>
+    </a>
+    <a
+      href={withBase(`/work/${next.id}`)}
+      class="group flex min-w-0 items-baseline gap-2 text-right hover:opacity-60 transition-opacity"
+    >
+      <span class="truncate">{next.data.title.toUpperCase()}</span>
+      <span class="shrink-0">→</span>
+    </a>
+  </div>
+</div>

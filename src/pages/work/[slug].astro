@@ -3,16 +3,35 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
 import BillboardShowcase from "../../components/BillboardShowcase.astro";
+import ProjectNav from "../../components/ProjectNav.astro";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
-  return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
-  }));
+  const byOrder = (a: (typeof projects)[number], b: (typeof projects)[number]) => a.data.order - b.data.order;
+
+  // Prev/next stays within the same credit group as the site's own listing
+  // pages (Director grid vs. Producer-only grid) so a project Justin only
+  // produced never sits in a sequence between projects he directed.
+  const directorSequence = projects.filter((p) => p.data.roles.includes("Director")).sort(byOrder);
+  const producerOnlySequence = projects
+    .filter((p) => p.data.roles.includes("Producer") && !p.data.roles.includes("Director"))
+    .sort(byOrder);
+
+  return projects.map((project) => {
+    const sequence = project.data.roles.includes("Director") ? directorSequence : producerOnlySequence;
+    const index = sequence.findIndex((p) => p.id === project.id);
+    return {
+      params: { slug: project.id },
+      props: {
+        project,
+        prev: sequence[(index - 1 + sequence.length) % sequence.length],
+        next: sequence[(index + 1) % sequence.length],
+      },
+    };
+  });
 }
 
-const { project } = Astro.props;
+const { project, prev, next } = Astro.props;
 const { title, client, roles, director, additionalProducers } = project.data;
 
 const directorName = director ?? (roles.includes("Director") ? "Justin Reid Tvedt" : undefined);
@@ -48,4 +67,6 @@ const hasCredits = Boolean(directorName) || producerNames.length > 0;
   </div>
 
   {project.data.heroFit === "contain" && <BillboardShowcase project={project} />}
+
+  <ProjectNav prev={prev} next={next} />
 </Layout>

@@ -1,10 +1,23 @@
 ---
-import { getEntry } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
+import ProjectNav from "../../components/ProjectNav.astro";
 
 const project = await getEntry("projects", "local-h-lifers");
 if (!project) throw new Error("local-h-lifers project entry not found");
+
+const allProjects = await getCollection("projects");
+const byOrder = (a: (typeof allProjects)[number], b: (typeof allProjects)[number]) => a.data.order - b.data.order;
+
+// Local H: Lifers is a Producer-only credit — keep it in that same
+// sequence rather than mixed in with projects Justin directed.
+const producerOnlySequence = allProjects
+  .filter((p) => p.data.roles.includes("Producer") && !p.data.roles.includes("Director"))
+  .sort(byOrder);
+const index = producerOnlySequence.findIndex((p) => p.id === project.id);
+const prev = producerOnlySequence[(index - 1 + producerOnlySequence.length) % producerOnlySequence.length];
+const next = producerOnlySequence[(index + 1) % producerOnlySequence.length];
 
 const { title, client } = project.data;
 
@@ -67,4 +80,6 @@ const credits = [
       </div>
     </div>
   </div>
+
+  <ProjectNav prev={prev} next={next} />
 </Layout>
