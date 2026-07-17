@@ -38,10 +38,6 @@ const { heroSrc, heroPoster, heroObjectPosition, format, client, placement } = p
 )}
 
 <script>
-  // Source cuts often end on a broadcast fade-to-black. Restart each loop
-  // just before the true end so that tail never gets a chance to render.
-  const LOOP_FADE_GUARD = 0.4;
-
   document.addEventListener("astro:page-load", () => {
     document.querySelectorAll<HTMLVideoElement>(".billboard-showcase video").forEach((video) => {
       if (video.dataset.loopInit) return;
@@ -50,11 +46,8 @@ const { heroSrc, heroPoster, heroObjectPosition, format, client, placement } = p
       // browser's media resource-selection algorithm (and autoplay) doesn't run
       // automatically for src set that way, so force it.
       video.load();
-      video.addEventListener("timeupdate", () => {
-        if (video.duration && video.currentTime >= video.duration - LOOP_FADE_GUARD) {
-          video.currentTime = 0;
-        }
-      });
+      // The file itself has a crossfade baked into its tail so native `loop`
+      // restarts cleanly — no JS-side early restart needed here.
     });
   });
 </script>
